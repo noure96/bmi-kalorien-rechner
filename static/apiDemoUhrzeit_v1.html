@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>Funktionale API Demo</title>
+</head>
+<body>
+
+    <h1>Serverzeit</h1>
+    <p id="time">Noch nicht geladen</p>
+
+    <button onclick="loadTime()">Zeit laden</button>
+
+    <script>
+
+        // Diese Funktion ändert den Text im <p>-Element
+        function updateTime(text) {
+            var timeElement = document.getElementById('time');
+            timeElement.innerText = text;
+        }
+
+        // Diese Funktion ruft die API auf
+        function loadTime() {
+
+            // HTTP-Anfrage an den Server senden
+            var request = fetch('/api/time');
+
+            // Warten auf die Server-Antwort
+            request.then(function(response) {
+
+                // Antwort in JSON umwandeln
+                var jsonData = response.json();
+
+                jsonData.then(function(data) {
+
+                    // Zeit aus dem JSON lesen
+                    var serverTime = data.time;
+
+                    // Zeit im HTML anzeigen
+                    updateTime(serverTime);
+
+                });
+
+            }).catch(function(error) {
+
+                // Falls etwas schiefgeht
+                updateTime('Fehler beim Laden');
+
+            });
+
+        }
+
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,40 @@
+*{
+    box-sizing: border-box;
+}
+
+body{
+    background-color: beige;
+}
+
+
+nav ul{
+    list-style-type: none;
+    padding: 0;
+}
+
+
+nav ul li{
+    margin-bottom: 10px;
+}
+
+nav ul li a{
+    text-decoration: none;
+    background-color: silver;
+    color: rgb(33, 33, 33);
+    display: inline-block;
+    width: 150px;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    padding: 10px 0 10px 20px;
+    font-size: 1.2rem;
+    transition: all 1.5s;
+}
+
+nav ul li a:hover{
+    background: green;
+    color: rgb(255, 255, 255);
+    width: 190px;
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
+    border-right: 20px solid red;
+    text-align: center;
+}

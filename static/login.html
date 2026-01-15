@@ -1,0 +1,80 @@
+<html>
+    <head></head>
+    <body>
+
+    <form id="loginForm">
+        <h2>Login</h2>
+
+        <label for="username">Benutzername:</label><br>
+        <input type="text" id="username" required><br><br>
+
+        <label for="password">Passwort:</label><br>
+        <input type="password" id="password" required><br><br>
+
+        <button type="submit">Einloggen</button>
+
+        <div id="hier-error-message-reinladen"></div>
+    </form>
+
+
+    <script>
+        // Vervollständigt das Dokument. 
+        // Die API soll Username und Passwort an /api/login senden und 
+        // erwartet zwei werte zurück (Token, Bool)
+        
+        document.getElementById("loginForm").addEventListener("submit", async function(e) {
+            e.preventDefault(); // verhindert das normale Absenden des Formulars
+
+            const loginData = {
+                username: document.getElementById("username").value,
+                password: document.getElementById("password").value
+            };
+
+            try {
+                const checkLogin = await fetch('/api/login', {
+                method: 'POST',
+                headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(loginData)
+        });
+
+    // HTTP-Fehler abfangen (z. B. 400, 401, 500)
+    if (!checkLogin.ok) {
+        throw new Error(`HTTP-Fehler: ${checkLogin.status}`);
+    }
+
+    const response = await checkLogin.json();
+
+    if (response?.success === true && response?.token) {
+        // Token sicher speichern
+        localStorage.setItem('token', response.token);
+
+        // Weiterleitung
+        window.location.replace('/index.html');
+    } else {
+        showError('Ungültiger Benutzername oder Passwort.');
+    }
+
+} catch (error) {
+    console.error('Login-Fehler:', error);
+    showError('Serverfehler. Bitte versuche es später erneut.');
+}
+
+/**
+ * Zentrale Fehleranzeige
+ */
+function showError(message) {
+    const errorElement = document.getElementById('hier-error-message-reinladen');
+    if (errorElement) {
+        errorElement.textContent = message;
+        errorElement.style.display = 'block';
+    }
+}
+
+        });
+                  
+            </script>
+        
+    </body>
+</html>

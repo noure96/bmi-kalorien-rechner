@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BMI-Rechner</title>
+
+    <link rel="apple-touch-icon" sizes="180x180" href="favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon/favicon-16x16.png">
+    <link rel="manifest" href="favicon/site.webmanifest">
+
+    <link rel="stylesheet" href="css/grid.css">
+    <link rel="stylesheet" href="css/menue.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <section class="wrapper">
+        <header>
+            <h1>BMI- & Kalorien-Rechner</h1>
+        </header>
+
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="bmirechner.html">BMI-Rechner</a></li>
+                <li><a href="daten.html">Daten</a></li>
+                <li><a href="profil.html">Profil</a></li>
+                <li><a href="logout.html">Logout</a></li>
+            </ul>
+        </nav>
+
+        <main>
+            <div class="container">
+                <form id="rechner-form">
+                    <input type="number" id="groesse" placeholder="Größe (cm)" required>
+                    <input type="number" id="gewicht" placeholder="Gewicht (kg)" required>
+                    <input type="number" id="alter" placeholder="Alter" required>
+
+                    <label for="geschlecht">Geschlecht</label>
+                    <select id="geschlecht">
+                        <option value="maennlich">Männlich</option>
+                        <option value="weiblich">Weiblich</option>
+                    </select>
+
+                    <label for="aktivitaet">Aktivitätslevel</label>
+                    <select id="aktivitaet">
+                        <option value="1.2">Niedrig aktiv</option>
+                        <option value="1.55">Mittel aktiv</option>
+                        <option value="1.75">Sehr aktiv</option>
+                    </select>
+
+                    <button type="submit">Berechnen</button>
+                </form>
+
+                <div id="ergebnis">
+                </div>
+            </div>
+
+            <script src="js/projekt.js"></script>
+        </main>
+
+        <footer>
+
+        </footer>
+    </section>
+    
+
+    
+    
+</body>
+</html>
