@@ -13,17 +13,18 @@
     <link rel="stylesheet" href="css/grid.css">
     <link rel="stylesheet" href="css/menue.css">
     <link rel="stylesheet" href="css/style.css">
+
+    <style>
+        #bmiSection { display: block; } /* Formular immer sichtbar */
+        #ergebnis { display: none; margin-top:10px; }
+        #error { color:red; margin-top:10px; }
+    </style>
 </head>
 <body>
 
 <section class="wrapper">
     <header>
         <h1>BMI- & Kalorien-Rechner</h1>
-        <style>
-            #bmiSection { display: none; }
-            #error { color:red; margin-top:10px; }
-            #ergebnis { display: none;}
-        </style>
     </header>
 
     <nav>
@@ -71,6 +72,59 @@
 <!-- Auth & BMI Logik -->
 <script src="js/projekt.js"></script>
 <script src="js/auth.js"></script>
+
+<script>
+    // Ergebnis-Box zunächst ausblenden, wird in projekt.js beim Berechnen eingeblendet
+    const form = document.getElementById('rechner-form');
+    const ergebnisDiv = document.getElementById('ergebnis');
+
+    form.addEventListener('submit', function(event){
+        event.preventDefault();
+
+        const groesse = Number(document.getElementById("groesse").value);
+        const gewicht = Number(document.getElementById("gewicht").value);
+        const alter = Number(document.getElementById("alter").value);
+        const geschlecht = document.getElementById("geschlecht").value;
+        const aktivitaet = Number(document.getElementById("aktivitaet").value);
+
+        const groesseM = groesse / 100;
+        const bmi = gewicht / (groesseM * groesseM);
+
+        let grundumsatz;
+        if(geschlecht === 'maennlich')
+            grundumsatz = 10*gewicht + 6.25*groesse - 5*alter +5;
+        else
+            grundumsatz = 10*gewicht + 6.25*groesse - 5*alter -161;
+
+        const kalorien = grundumsatz * aktivitaet;
+
+        // Ergebnis sichtbar machen
+        ergebnisDiv.style.display = 'block';
+        ergebnisDiv.innerHTML = `
+            <p>BMI: ${bmi.toFixed(1)}</p>
+            <p>Kalorienbedarf: ${Math.round(kalorien)} kcal / Tag</p>
+        `;
+
+        // Optional: Profil speichern, falls eingeloggt
+        const token = localStorage.getItem('token');
+        if(token){
+            fetch('/api/profile/save', {
+                method:'POST',
+                headers:{'Content-Type':'application/json'},
+                body: JSON.stringify({
+                    token,
+                    height: groesse,
+                    weight: gewicht,
+                    age: alter,
+                    gender: geschlecht,
+                    activity: aktivitaet,
+                    bmi: bmi.toFixed(1),
+                    calories: Math.round(kalorien)
+                })
+            });
+        }
+    });
+</script>
 
 </body>
 </html>
