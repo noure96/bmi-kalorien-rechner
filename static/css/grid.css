@@ -16,7 +16,7 @@ body{
 
 .wrapper{
     position: relative;
-    width: 1200px;                              /* Begrenzung */
+    width: 1000px;                              /* Begrenzung */
     background-color: beige;                  /* links */
     margin: 0 auto 0 auto;                      /* und */
     display: grid;                              /* rechts */
@@ -34,7 +34,13 @@ body{
 
 header{
     grid-area: kopf;
-    _background: url("../img/background_1_1000px.jpg") no-repeat center center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 12px 0;
+    margin: 0;
     background-size: cover;
 }
 
@@ -44,9 +50,4 @@ nav{
 
 main{
     grid-area: main;
-}
-
-footer{
-    grid-area: foot;
-    background-color: #0f0;
 }

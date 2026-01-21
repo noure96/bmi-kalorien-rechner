@@ -11,6 +11,12 @@
     justify-content: center;
 } */
 
+.rechner{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
 .container {
     background: white;
     padding: 2rem;
@@ -22,6 +28,16 @@
 h1 {
     text-align: center;
     margin-bottom: 1rem;
+}
+
+.home{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 12px 0;
+    margin: 0;
 }
 
 form {
