@@ -2,112 +2,48 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <title>BMI Rechner</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
 
-    <style>
-        #bmiSection { display: none; }
-        #error { color: red; margin-top: 10px; }
-    </style>
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
-<!-- 🔐 LOGIN -->
-<form id="loginForm">
-    <h2>Login</h2>
+    <main>
+        <h2>Login</h2>
 
-    <label>Benutzername:</label><br>
-    <input type="text" id="username" required><br><br>
+        <form id="loginForm">
+            <input type="text" id="username" placeholder="Benutzername" required>
+            <input type="password" id="password" placeholder="Passwort" required>
+            <button type="submit">Einloggen</button>
+            <div id="error"></div>
+        </form>
+    </main>
 
-    <label>Passwort:</label><br>
-    <input type="password" id="password" required minlength="5"><br><br>
+    <script>
+        document.getElementById("loginForm").addEventListener("submit", async e => {
+            e.preventDefault();
 
-    <button type="submit">Einloggen</button>
+            const res = await fetch("/api/login", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    username: username.value.trim(),
+                    password: password.value
+                })
+            });
 
-    <div id="error"></div>
-</form>
+            const data = await res.json();
 
-<!-- ⚖️ BMI -->
-<section id="bmiSection">
-    <h2>BMI Rechner</h2>
-
-    <label>Größe (cm):</label><br>
-    <input type="number" id="height" required><br><br>
-
-    <label>Gewicht (kg):</label><br>
-    <input type="number" id="weight" required><br><br>
-
-    <button id="calcBMI">BMI berechnen</button>
-
-    <p id="bmiResult"></p>
-</section>
-
-<script>
-// 🔐 Beim Laden prüfen, ob Token existiert
-document.addEventListener('DOMContentLoaded', () => {
-    const token = localStorage.getItem('token');
-    if (token) {
-        unlockBMI();
-    }
-});
-
-// 🔐 LOGIN
-document.getElementById('loginForm').addEventListener('submit', async function (e) {
-    e.preventDefault();
-
-    const loginData = {
-        username: document.getElementById('username').value.trim(),
-        password: document.getElementById('password').value
-    };
-
-    try {
-        const res = await fetch('/api/login', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(loginData)
+            if (data.success && data.token) {
+                localStorage.setItem("token", data.token);
+                location.href = "bmirechner.html";
+            } else {
+                document.getElementById("error").textContent =
+                    "Login fehlgeschlagen";
+            }
         });
-
-        if (!res.ok) throw new Error('HTTP Fehler');
-
-        const data = await res.json();
-
-        if (data.success && data.token) {
-            localStorage.setItem('token', data.token);
-            unlockBMI();
-        } else {
-            showError('Ungültige Login-Daten.');
-        }
-
-    } catch {
-        showError('Serverfehler. Bitte später erneut versuchen.');
-    }
-});
-
-// ⚖️ BMI BERECHNUNG
-document.getElementById('calcBMI').addEventListener('click', () => {
-    const height = document.getElementById('height').value / 100;
-    const weight = document.getElementById('weight').value;
-
-    if (!height || !weight) {
-        document.getElementById('bmiResult').textContent = 'Bitte alle Felder ausfüllen.';
-        return;
-    }
-
-    const bmi = (weight / (height * height)).toFixed(2);
-    document.getElementById('bmiResult').textContent = `Dein BMI: ${bmi}`;
-});
-
-// 🔓 UI freischalten
-function unlockBMI() {
-    document.getElementById('loginForm').style.display = 'none';
-    document.getElementById('bmiSection').style.display = 'block';
-}
-
-// ❌ Fehler anzeigen
-function showError(message) {
-    const error = document.getElementById('error');
-    error.textContent = message;
-}
-</script>
+    </script>
 
 </body>
 </html>
