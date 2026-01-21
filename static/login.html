@@ -44,6 +44,16 @@
             }
         });
     </script>
+    <script>
+if (sessionStorage.getItem('fromBMI') !== 'true') {
+    // Kein Zugriff: Zurück zur BMI-Seite
+    window.location.href = 'bmirechner.html';
+} else {
+    // Zugriff erlaubt → Sitzung zurücksetzen, damit man Seite nicht neu laden kann
+    sessionStorage.removeItem('fromBMI');
+}
+</script>
+
 
 </body>
 </html>
