@@ -63,43 +63,9 @@
     <footer></footer>
 </section>
 
-<!-- Auth-Button Steuerung mit rotem Logout -->
-<script>
-const authBtn = document.getElementById('authBtn');
-
-function updateAuthButton() {
-    const token = localStorage.getItem('token');
-    if (token) {
-        // Eingeloggt → Button zu Logout
-        authBtn.textContent = 'Logout';
-        authBtn.style.backgroundColor = 'red';
-        authBtn.style.color = 'white';
-        authBtn.onclick = async () => {
-            await fetch('/api/logout', {
-                method: 'POST',
-                headers: {'Content-Type':'application/json'},
-                body: JSON.stringify({ token })
-            });
-            localStorage.removeItem('token');
-            location.reload();
-        };
-    } else {
-        // Nicht eingeloggt → Button Login
-        authBtn.textContent = 'Login';
-        authBtn.style.backgroundColor = '';
-        authBtn.style.color = '';
-        authBtn.onclick = () => {
-            window.location.href = 'login.html';
-        };
-    }
-}
-
-document.addEventListener('DOMContentLoaded', updateAuthButton);
-</script>
-
-<!-- Projekt.js einbinden -->
-<script src="js/auth.js"></script>
+<!-- Auth & BMI Logik -->
 <script src="js/projekt.js"></script>
+<script src="js/auth.js"></script>
 
 </body>
 </html>

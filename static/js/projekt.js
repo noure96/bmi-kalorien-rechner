@@ -1,60 +1,25 @@
-// LOGIN
-document.getElementById('loginForm').addEventListener('submit', async e => {
-    e.preventDefault();
-    const loginData = {
-        username: document.getElementById('username').value.trim(),
-        password: document.getElementById('password').value
-    };
-    try {
-        const res = await fetch('/api/login', {
-            method: 'POST',
-            headers: {'Content-Type':'application/json'},
-            body: JSON.stringify(loginData)
-        });
-        if (!res.ok) throw new Error('HTTP Fehler');
-        const data = await res.json();
-        if (data.success && data.token) {
-            localStorage.setItem('token', data.token);
-            unlockBMI();
-        } else showError('Ungültige Login-Daten.');
-    } catch { showError('Serverfehler'); }
-});
-
-// UI freischalten
-function unlockBMI() {
-    document.getElementById('loginForm').style.display = 'none';
-    document.getElementById('bmiSection').style.display = 'block';
-    loadProfile(); // Profil laden
-}
-
-
-// Fehler anzeigen
-function showError(msg) {
-    document.getElementById('error').textContent = msg;
-}
-
-// Logout
-document.getElementById('logoutBtn').addEventListener('click', () => {
-    const token = localStorage.getItem('token');
-    fetch('/api/logout', {
-        method:'POST',
-        headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({token})
-    });
-    localStorage.removeItem('token');
-    location.reload();
-});
-
-// Beim Laden prüfen
+// Beim Laden prüfen, ob Token vorhanden ist und BMI freischalten
 document.addEventListener('DOMContentLoaded', () => {
     const token = localStorage.getItem('token');
     if (token) unlockBMI();
 });
 
-// BMI Rechner
-const form = document.getElementById("rechner-form");
-const ergebnisDiv = document.getElementById("ergebnis");
+// UI freischalten nach Login
+function unlockBMI() {
+    // Falls Login-Form vorhanden (login.html) → ausblenden
+    const loginForm = document.getElementById('loginForm');
+    if (loginForm) loginForm.style.display = 'none';
+    document.getElementById('bmiSection').style.display = 'block';
+    loadProfile(); // Profil laden
+}
 
+// Fehler anzeigen
+function showError(msg) {
+    const errorDiv = document.getElementById('error');
+    if (errorDiv) errorDiv.textContent = msg;
+}
+
+// Profil laden
 async function loadProfile() {
     const token = localStorage.getItem('token');
     if (!token) return;
@@ -65,7 +30,6 @@ async function loadProfile() {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ token })
         });
-
         if (!res.ok) return;
 
         const data = await res.json();
@@ -79,7 +43,7 @@ async function loadProfile() {
         document.getElementById("geschlecht").value = gender;
         document.getElementById("aktivitaet").value = activity;
 
-        ergebnisDiv.innerHTML = `
+        document.getElementById("ergebnis").innerHTML = `
             <p>BMI: ${bmi}</p>
             <p>Kalorienbedarf: ${calories} kcal / Tag</p>
         `;
@@ -87,6 +51,10 @@ async function loadProfile() {
         console.error("Profil konnte nicht geladen werden", e);
     }
 }
+
+// BMI & Kalorienrechner
+const form = document.getElementById("rechner-form");
+const ergebnisDiv = document.getElementById("ergebnis");
 
 form.addEventListener("submit", function(event) {
     event.preventDefault();
@@ -112,11 +80,22 @@ form.addEventListener("submit", function(event) {
         <p>Kalorienbedarf: ${Math.round(kalorien)} kcal / Tag</p>
     `;
 
-    // Optional: Profil speichern
+    // Optional: Profil speichern, falls eingeloggt
     const token = localStorage.getItem('token');
-    fetch('/api/profile/save', {
-        method:'POST',
-        headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({token, height: groesse, weight: gewicht, age: alter, gender: geschlecht, activity: aktivitaet, bmi: bmi.toFixed(1), calories: Math.round(kalorien)})
-    });
+    if (token) {
+        fetch('/api/profile/save', {
+            method:'POST',
+            headers:{'Content-Type':'application/json'},
+            body: JSON.stringify({
+                token,
+                height: groesse,
+                weight: gewicht,
+                age: alter,
+                gender: geschlecht,
+                activity: aktivitaet,
+                bmi: bmi.toFixed(1),
+                calories: Math.round(kalorien)
+            })
+        });
+    }
 });
