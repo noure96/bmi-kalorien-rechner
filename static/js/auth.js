@@ -4,7 +4,7 @@ function updateAuthButton() {
     const token = localStorage.getItem('token');
 
     if (token) {
-        // Benutzer ist eingeloggt → Button zeigt Logout
+        // Eingeloggt → Logout Button
         authBtn.textContent = 'Logout';
         authBtn.style.backgroundColor = 'red';
         authBtn.style.color = 'white';
@@ -12,18 +12,17 @@ function updateAuthButton() {
             try {
                 await fetch('/api/logout', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: {'Content-Type':'application/json'},
                     body: JSON.stringify({ token })
                 });
-            } catch (e) {
+            } catch(e) {
                 console.warn("Server Logout fehlgeschlagen", e);
             }
-
             // Token und Marker löschen
             localStorage.removeItem('token');
             sessionStorage.removeItem('fromBMI');
 
-            // Button zurücksetzen auf Login
+            // Button zurück auf Login
             authBtn.textContent = 'Login';
             authBtn.style.backgroundColor = '';
             authBtn.style.color = '';
@@ -33,16 +32,16 @@ function updateAuthButton() {
             };
         };
     } else {
-        // Benutzer nicht eingeloggt → Button zeigt Login
+        // Nicht eingeloggt → Login Button
         authBtn.textContent = 'Login';
         authBtn.style.backgroundColor = '';
         authBtn.style.color = '';
         authBtn.onclick = () => {
-            sessionStorage.setItem('fromBMI', 'true');
+            sessionStorage.setItem('fromBMI','true');
             window.location.href = 'login.html';
         };
     }
 }
 
-// Initial aufrufen, sobald die Seite geladen wird
+// Initialisieren beim Laden
 document.addEventListener('DOMContentLoaded', updateAuthButton);

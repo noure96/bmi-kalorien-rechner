@@ -1,23 +1,11 @@
-// Beim Laden prüfen, ob Token vorhanden ist und BMI freischalten
+const form = document.getElementById("rechner-form");
+const ergebnisDiv = document.getElementById("ergebnis");
+
+// Beim Laden prüfen, ob der Benutzer eingeloggt ist und Profil laden
 document.addEventListener('DOMContentLoaded', () => {
     const token = localStorage.getItem('token');
-    if (token) unlockBMI();
+    if (token) loadProfile();
 });
-
-// UI freischalten nach Login
-function unlockBMI() {
-    // Falls Login-Form vorhanden (login.html) → ausblenden
-    const loginForm = document.getElementById('loginForm');
-    if (loginForm) loginForm.style.display = 'none';
-    document.getElementById('bmiSection').style.display = 'block';
-    loadProfile(); // Profil laden
-}
-
-// Fehler anzeigen
-function showError(msg) {
-    const errorDiv = document.getElementById('error');
-    if (errorDiv) errorDiv.textContent = msg;
-}
 
 // Profil laden
 async function loadProfile() {
@@ -30,6 +18,7 @@ async function loadProfile() {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ token })
         });
+
         if (!res.ok) return;
 
         const data = await res.json();
@@ -37,13 +26,16 @@ async function loadProfile() {
 
         const { height, weight, age, gender, activity, bmi, calories } = data.profile;
 
+        // Werte ins Formular eintragen
         document.getElementById("groesse").value = height;
         document.getElementById("gewicht").value = weight;
         document.getElementById("alter").value = age;
         document.getElementById("geschlecht").value = gender;
         document.getElementById("aktivitaet").value = activity;
 
-        document.getElementById("ergebnis").innerHTML = `
+        // Ergebnis anzeigen
+        ergebnisDiv.style.display = 'block';
+        ergebnisDiv.innerHTML = `
             <p>BMI: ${bmi}</p>
             <p>Kalorienbedarf: ${calories} kcal / Tag</p>
         `;
@@ -52,12 +44,10 @@ async function loadProfile() {
     }
 }
 
-// BMI & Kalorienrechner
-const form = document.getElementById("rechner-form");
-const ergebnisDiv = document.getElementById("ergebnis");
-
+// BMI & Kalorien Berechnung + Speichern
 form.addEventListener("submit", function(event) {
     event.preventDefault();
+
     const groesse = Number(document.getElementById("groesse").value);
     const gewicht = Number(document.getElementById("gewicht").value);
     const alter = Number(document.getElementById("alter").value);
@@ -69,18 +59,20 @@ form.addEventListener("submit", function(event) {
 
     let grundumsatz;
     if (geschlecht === "maennlich")
-        grundumsatz = 10*gewicht + 6.25*groesse - 5*alter +5;
+        grundumsatz = 10*gewicht + 6.25*groesse - 5*alter + 5;
     else
-        grundumsatz = 10*gewicht + 6.25*groesse - 5*alter -161;
+        grundumsatz = 10*gewicht + 6.25*groesse - 5*alter - 161;
 
     const kalorien = grundumsatz * aktivitaet;
 
+    // Ergebnis anzeigen
+    ergebnisDiv.style.display = 'block';
     ergebnisDiv.innerHTML = `
         <p>BMI: ${bmi.toFixed(1)}</p>
         <p>Kalorienbedarf: ${Math.round(kalorien)} kcal / Tag</p>
     `;
 
-    // Optional: Profil speichern, falls eingeloggt
+    // Profil speichern, falls eingeloggt
     const token = localStorage.getItem('token');
     if (token) {
         fetch('/api/profile/save', {
