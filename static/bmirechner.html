@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BMI-Rechner</title>
+    <title>BMI- & Kalorien-Rechner</title>
 
     <link rel="apple-touch-icon" sizes="180x180" href="favicon/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="favicon/favicon-32x32.png">
@@ -27,12 +27,11 @@
             <li><a href="bmirechner.html" class="active">BMI-Rechner</a></li>
             <li><a href="daten.html">Daten</a></li>
             <li><a href="profil.html">Profil</a></li>
-            <li><a href="logout.html">Logout</a></li>
         </ul>
     </nav>
 
     <main>
-        <!-- Dynamischer Login/Logout-Button -->
+        <!-- Login/Logout Button -->
         <button id="authBtn" type="button">Login</button>
 
         <div id="bmiSection">
@@ -64,60 +63,43 @@
     <footer></footer>
 </section>
 
-<!-- 🔐 Auth & Login/Logout-Button -->
+<!-- Auth-Button Steuerung mit rotem Logout -->
 <script>
 const authBtn = document.getElementById('authBtn');
 
-// Funktion, um Button je nach Login-Status anzupassen
 function updateAuthButton() {
-    if (sessionStorage.getItem('loggedIn') === 'true') {
+    const token = localStorage.getItem('token');
+    if (token) {
+        // Eingeloggt → Button zu Logout
         authBtn.textContent = 'Logout';
-        authBtn.onclick = () => {
-            sessionStorage.removeItem('loggedIn');
-            window.location.reload();
+        authBtn.style.backgroundColor = 'red';
+        authBtn.style.color = 'white';
+        authBtn.onclick = async () => {
+            await fetch('/api/logout', {
+                method: 'POST',
+                headers: {'Content-Type':'application/json'},
+                body: JSON.stringify({ token })
+            });
+            localStorage.removeItem('token');
+            location.reload();
         };
     } else {
+        // Nicht eingeloggt → Button Login
         authBtn.textContent = 'Login';
+        authBtn.style.backgroundColor = '';
+        authBtn.style.color = '';
         authBtn.onclick = () => {
-            sessionStorage.setItem('fromBMI', 'true');
             window.location.href = 'login.html';
         };
     }
 }
 
-// Beim Laden der Seite Button prüfen
-updateAuthButton();
+document.addEventListener('DOMContentLoaded', updateAuthButton);
 </script>
 
-<!-- 🧮 BMI Rechner -->
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-    const form = document.getElementById('rechner-form');
-    const ergebnisDiv = document.getElementById('ergebnis');
-
-    form.addEventListener('submit', function(e) {
-        e.preventDefault(); // Verhindert Neuladen
-
-        const groesse = parseFloat(document.getElementById('groesse').value);
-        const gewicht = parseFloat(document.getElementById('gewicht').value);
-
-        if (!groesse || !gewicht) {
-            ergebnisDiv.textContent = 'Bitte Größe und Gewicht eingeben.';
-            return;
-        }
-
-        const bmi = gewicht / ((groesse / 100) ** 2);
-        let status = '';
-
-        if (bmi < 18.5) status = 'Untergewicht';
-        else if (bmi < 25) status = 'Normalgewicht';
-        else if (bmi < 30) status = 'Übergewicht';
-        else status = 'Adipositas';
-
-        ergebnisDiv.innerHTML = `Ihr BMI: <strong>${bmi.toFixed(1)}</strong> (${status})`;
-    });
-});
-</script>
+<!-- Projekt.js einbinden -->
+<script src="js/auth.js"></script>
+<script src="js/projekt.js"></script>
 
 </body>
 </html>
