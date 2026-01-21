@@ -16,54 +16,108 @@
 </head>
 <body>
 
-    <section class="wrapper">
-        <header>
-            <h1>BMI- & Kalorien-Rechner</h1>
-        </header>
+<section class="wrapper">
+    <header>
+        <h1>BMI- & Kalorien-Rechner</h1>
+    </header>
 
-        <nav>
-            <ul>
-                <li><a href="index.html">Home</a></li>
-                <li><a href="bmirechner.html" class="active">BMI-Rechner</a></li>
-                <li><a href="daten.html">Daten</a></li>
-                <li><a href="profil.html">Profil</a></li>
-                <li><a href="logout.html">Logout</a></li>
-            </ul>
-        </nav>
+    <nav>
+        <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="bmirechner.html" class="active">BMI-Rechner</a></li>
+            <li><a href="daten.html">Daten</a></li>
+            <li><a href="profil.html">Profil</a></li>
+            <li><a href="logout.html">Logout</a></li>
+        </ul>
+    </nav>
 
-        <main>
-            <!-- Login-Button -->
-    <button id="authBtn" type="button">Login</button>
-            <div id="bmiSection">
-<form id="rechner-form">
-<input type="number" id="groesse" placeholder="Größe (cm)" required>
-<input type="number" id="gewicht" placeholder="Gewicht (kg)" required>
-<input type="number" id="alter" placeholder="Alter" required>
-<label>Geschlecht</label>
-<select id="geschlecht">
-<option value="maennlich">Männlich</option>
-<option value="weiblich">Weiblich</option>
-</select>
-<label>Aktivitätslevel</label>
-<select id="aktivitaet">
-<option value="1.2">Niedrig aktiv</option>
-<option value="1.55">Mittel aktiv</option>
-<option value="1.75">Sehr aktiv</option>
-</select>
-<button type="submit">Berechnen</button>
-</form>
-<div id="ergebnis"></div>
-        </main>
+    <main>
+        <!-- Dynamischer Login/Logout-Button -->
+        <button id="authBtn" type="button">Login</button>
 
-        <footer></footer>
-    </section>
+        <div id="bmiSection">
+            <form id="rechner-form">
+                <input type="number" id="groesse" placeholder="Größe (cm)" required>
+                <input type="number" id="gewicht" placeholder="Gewicht (kg)" required>
+                <input type="number" id="alter" placeholder="Alter" required>
 
-    <!-- 🔐 Auth-Check: leitet auf login.html weiter -->
-    <script src="js/auth.js"></script>
+                <label>Geschlecht</label>
+                <select id="geschlecht">
+                    <option value="maennlich">Männlich</option>
+                    <option value="weiblich">Weiblich</option>
+                </select>
 
-    <!-- 🧮 BMI Logik -->
-    <script src="js/bmi.js"></script>
-    <script src="js/projekt.js"></script>
+                <label>Aktivitätslevel</label>
+                <select id="aktivitaet">
+                    <option value="1.2">Niedrig aktiv</option>
+                    <option value="1.55">Mittel aktiv</option>
+                    <option value="1.75">Sehr aktiv</option>
+                </select>
+
+                <button type="submit">Berechnen</button>
+            </form>
+
+            <div id="ergebnis"></div>
+        </div>
+    </main>
+
+    <footer></footer>
+</section>
+
+<!-- 🔐 Auth & Login/Logout-Button -->
+<script>
+const authBtn = document.getElementById('authBtn');
+
+// Funktion, um Button je nach Login-Status anzupassen
+function updateAuthButton() {
+    if (sessionStorage.getItem('loggedIn') === 'true') {
+        authBtn.textContent = 'Logout';
+        authBtn.onclick = () => {
+            sessionStorage.removeItem('loggedIn');
+            window.location.reload();
+        };
+    } else {
+        authBtn.textContent = 'Login';
+        authBtn.onclick = () => {
+            sessionStorage.setItem('fromBMI', 'true');
+            window.location.href = 'login.html';
+        };
+    }
+}
+
+// Beim Laden der Seite Button prüfen
+updateAuthButton();
+</script>
+
+<!-- 🧮 BMI Rechner -->
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const form = document.getElementById('rechner-form');
+    const ergebnisDiv = document.getElementById('ergebnis');
+
+    form.addEventListener('submit', function(e) {
+        e.preventDefault(); // Verhindert Neuladen
+
+        const groesse = parseFloat(document.getElementById('groesse').value);
+        const gewicht = parseFloat(document.getElementById('gewicht').value);
+
+        if (!groesse || !gewicht) {
+            ergebnisDiv.textContent = 'Bitte Größe und Gewicht eingeben.';
+            return;
+        }
+
+        const bmi = gewicht / ((groesse / 100) ** 2);
+        let status = '';
+
+        if (bmi < 18.5) status = 'Untergewicht';
+        else if (bmi < 25) status = 'Normalgewicht';
+        else if (bmi < 30) status = 'Übergewicht';
+        else status = 'Adipositas';
+
+        ergebnisDiv.innerHTML = `Ihr BMI: <strong>${bmi.toFixed(1)}</strong> (${status})`;
+    });
+});
+</script>
 
 </body>
 </html>
