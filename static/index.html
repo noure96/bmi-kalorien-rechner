@@ -38,23 +38,14 @@
 </section>
 
 <script>
-document.addEventListener("DOMContentLoaded", async () => {
-    const token = localStorage.getItem("token");
-    if (!token) return;
-
-    try {
-        const res = await fetch("/api/profile/get", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ token })
-        });
-        const data = await res.json();
-        if (data.success && data.profile) {
-            document.getElementById("username").textContent = localStorage.getItem("username");
-        }
-    } catch {}
+document.addEventListener("DOMContentLoaded", () => {
+    const username = localStorage.getItem("username");
+    if (username) {
+        document.getElementById("username").textContent = username;
+    }
 });
 </script>
+
 <script src="js/auth.js"></script>
 </body>
 </html>
