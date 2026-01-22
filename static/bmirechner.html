@@ -18,7 +18,8 @@
     <style>
         #ergebnis { display: none; margin-top: 10px; }
         #error { color:red; margin-top:10px; }
-        #bmiSection { display: block; } /* Formular immer sichtbar */
+        #bmiSection { display: block; }
+        #authBtn { padding: 8px 15px; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -64,36 +65,19 @@
             </form>
 
             <div id="ergebnis"></div>
+            <div id="error"></div>
         </div>
     </main>
 
     <footer>
-            <p>© BMI- & Kalorien-Rechner 2026</p>
-            <p>Ein Projekt von: Nour-Eddine Bekkali & Kevin Butgereit</p>
-        </footer>
+        <p>© BMI- & Kalorien-Rechner 2026</p>
+        <p>Ein Projekt von: Nour-Eddine Bekkali & Kevin Butgereit</p>
+    </footer>
 </section>
 
-<!-- Projekt.js & Auth.js -->
-<script src="js/projekt.js"></script>
+<!-- Skripte -->
 <script src="js/auth.js"></script>
-<script>
-document.getElementById("logoutBtn").onclick = async () => {
-    const token = localStorage.getItem("token");
-
-    try {
-        await fetch("/api/logout", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ token })
-        });
-    } catch {}
-
-    // 🔥 Alles zurücksetzen
-    localStorage.clear();
-
-    location.replace("login.html");
-};
-</script>
+<script src="js/bmi.js"></script>
 
 </body>
 </html>

@@ -4,31 +4,36 @@ const ergebnisDiv = document.getElementById("ergebnis");
 form.addEventListener("submit", async e => {
     e.preventDefault();
 
-    const groesse = Number(groesse.value);
-    const gewicht = Number(gewicht.value);
-    const alter = Number(alter.value);
-    const geschlecht = geschlecht.value;
-    const aktivitaet = Number(aktivitaet.value);
+    const groesse = Number(document.getElementById("groesse").value);
+    const gewicht = Number(document.getElementById("gewicht").value);
+    const alter = Number(document.getElementById("alter").value);
+    const geschlecht = document.getElementById("geschlecht").value;
+    const aktivitaet = Number(document.getElementById("aktivitaet").value);
+
+    if(!groesse || !gewicht || !alter) return;
 
     const bmi = gewicht / ((groesse / 100) ** 2);
-
-    const grundumsatz =
-        geschlecht === "maennlich"
-            ? 10 * gewicht + 6.25 * groesse - 5 * alter + 5
-            : 10 * gewicht + 6.25 * groesse - 5 * alter - 161;
+    const grundumsatz = geschlecht === "maennlich"
+        ? 10 * gewicht + 6.25 * groesse - 5 * alter + 5
+        : 10 * gewicht + 6.25 * groesse - 5 * alter - 161;
 
     const kalorien = Math.round(grundumsatz * aktivitaet);
 
+    ergebnisDiv.style.display = "block";
     ergebnisDiv.innerHTML = `
-        <p>BMI: ${bmi.toFixed(1)}</p>
-        <p>Kalorienbedarf: ${kalorien} kcal</p>
+        <p><strong>BMI:</strong> ${bmi.toFixed(1)}</p>
+        <p><strong>Kalorienbedarf:</strong> ${kalorien} kcal</p>
     `;
+
+    // Speichern im Profil
+    const token = localStorage.getItem("token");
+    if(!token) return;
 
     await fetch("/api/profile/save", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-            token: localStorage.getItem("token"),
+            token,
             height: groesse,
             weight: gewicht,
             age: alter,
@@ -40,12 +45,10 @@ form.addEventListener("submit", async e => {
     });
 });
 
-// 🔁 Beim Laden wiederherstellen
-document.addEventListener("DOMContentLoaded", loadProfile);
-
-async function loadProfile() {
+// Daten beim Laden wiederherstellen
+document.addEventListener("DOMContentLoaded", async () => {
     const token = localStorage.getItem("token");
-    if (!token) return;
+    if(!token) return;
 
     const res = await fetch("/api/profile/get", {
         method: "POST",
@@ -53,19 +56,23 @@ async function loadProfile() {
         body: JSON.stringify({ token })
     });
 
+    if(!res.ok) return;
     const data = await res.json();
-    if (!data.success || !data.profile) return;
+    if(!data.success || !data.profile) return;
 
     const p = data.profile;
 
-    groesse.value = p.height;
-    gewicht.value = p.weight;
-    alter.value = p.age;
-    geschlecht.value = p.gender;
-    aktivitaet.value = p.activity;
+    document.getElementById("groesse").value = p.height || "";
+    document.getElementById("gewicht").value = p.weight || "";
+    document.getElementById("alter").value = p.age || "";
+    document.getElementById("geschlecht").value = p.gender || "maennlich";
+    document.getElementById("aktivitaet").value = p.activity || 1.2;
 
-    ergebnisDiv.innerHTML = `
-        <p>BMI: ${p.bmi}</p>
-        <p>Kalorienbedarf: ${p.calories} kcal</p>
-    `;
-}
+    if(p.bmi && p.calories){
+        ergebnisDiv.style.display = "block";
+        ergebnisDiv.innerHTML = `
+            <p><strong>BMI:</strong> ${p.bmi}</p>
+            <p><strong>Kalorienbedarf:</strong> ${p.calories} kcal</p>
+        `;
+    }
+});

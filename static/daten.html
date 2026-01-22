@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Profil</title>
+    <title>Daten</title>
 
     <link rel="stylesheet" href="css/grid.css">
     <link rel="stylesheet" href="css/menue.css">
@@ -11,72 +11,67 @@
     <link rel="stylesheet" href="css/footer.css">
 </head>
 <body>
-    <section class="wrapper">
-        <header>
-            <h1>Mein Profil</h1>
-        </header>
+<section class="wrapper">
+    <header>
+        <h1>Mein Profil</h1>
+    </header>
 
-        <nav>
-            <ul>
-                <li><a href="index.html">Home</a></li>
-                <li><a href="bmirechner.html">BMI-Rechner</a></li>
-                <li><a href="daten.html">Daten</a></li>
-                <li><a href="profil.html" class="active">Profil</a></li>
-            </ul>
-        </nav>
+    <nav>
+        <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="bmirechner.html">BMI-Rechner</a></li>
+            <li><a href="daten.html" class="active">Daten</a></li>
+            <li><a href="profil.html">Profil</a></li>
+        </ul>
+    </nav>
 
-        <main>
-            <h2>Gespeicherte Daten</h2>
+    <main>
+        <h2>Gespeicherte Daten</h2>
+        <div id="datem">Lade Daten …</div>
+    </main>
 
-            <div id="datem">
-                <p>Lade Daten …</p>
-            </div>
-        </main>
+    <footer>
+        <p>© BMI- & Kalorien-Rechner 2026</p>
+        <p>Ein Projekt von: Nour-Eddine Bekkali & Kevin Butgereit</p>
+    </footer>
+</section>
 
-        <footer>
-            <p>© BMI- & Kalorien-Rechner 2026</p>
-            <p>Ein Projekt von: Nour-Eddine Bekkali & Kevin Butgereit</p>
-        </footer>
-    </section>
+<script src="js/auth.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", async () => {
+    const token = localStorage.getItem("token");
+    const datem = document.getElementById("datem");
 
-    <!-- Zugriffsschutz -->
-    <script src="js/auth.js"></script>
+    if (!token) {
+        datem.innerHTML = "<p>Bitte einloggen, um Daten zu sehen.</p>";
+        return;
+    }
 
-    <!-- Profil laden -->
-    <script>
-        document.addEventListener("DOMContentLoaded", async () => {
-            const token = localStorage.getItem("token");
-            if (!token) return;
-
-            try {
-                const res = await fetch("/api/profile/get", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ token })
-                });
-
-                if (!res.ok) throw new Error();
-
-                const data = await res.json();
-                if (!data.success || !data.profile) {
-                    document.getElementById("profil").innerHTML =
-                        "<p>Kein Profil vorhanden.</p>";
-                    return;
-                }
-
-                const p = data.profile;
-
-                document.getElementById("profil").innerHTML = `
-                    <p><strong>Aktivitätsfaktor:</strong> ${p.activity}</p>
-                    <p><strong>BMI:</strong> ${p.bmi}</p>
-                    <p><strong>Kalorienbedarf:</strong> ${p.calories} kcal / Tag</p>
-                `;
-            } catch {
-                document.getElementById("profil").innerHTML =
-                    "<p>Fehler beim Laden des Profils.</p>";
-            }
+    try {
+        const res = await fetch("/api/profile/get", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ token })
         });
-    </script>
 
+        if(!res.ok) throw new Error();
+        const data = await res.json();
+        if(!data.success || !data.profile) {
+            datem.innerHTML = "<p>Kein Profil vorhanden.</p>";
+            return;
+        }
+
+        const p = data.profile;
+        datem.innerHTML = `
+            <p><strong>Alter:</strong> ${p.age || "-"} Jahre</p
+            <p><strong>Geschlecht:</strong> ${p.gender || "-"}</p>
+            <p><strong>Größe:</strong> ${p.height || "-"} cm</p>
+            <p><strong>Gewicht:</strong> ${p.weight || "-"} kg</p>
+        `;
+    } catch {
+        datem.innerHTML = "<p>Fehler beim Laden der Daten.</p>";
+    }
+});
+</script>
 </body>
 </html>
