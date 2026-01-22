@@ -5,75 +5,57 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BMI- & Kalorien-Rechner</title>
 
-    <link rel="apple-touch-icon" sizes="180x180" href="favicon/apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="favicon/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="favicon/favicon-16x16.png">
-    <link rel="manifest" href="favicon/site.webmanifest">
-
     <link rel="stylesheet" href="css/grid.css">
     <link rel="stylesheet" href="css/menue.css">
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/footer.css">
-
-    <style>
-        #ergebnis { display: none; margin-top: 10px; }
-        #error { color:red; margin-top:10px; }
-        #bmiSection { display: block; } /* Formular immer sichtbar */
-    </style>
 </head>
 <body>
 
 <section class="wrapper">
-    <header>
-        <h1>BMI- & Kalorien-Rechner</h1>
-    </header>
+<header>
+    <h1>BMI- & Kalorien-Rechner</h1>
+</header>
 
-    <nav>
-        <ul>
-            <li><a href="index.html">Home</a></li>
-            <li><a href="bmirechner.html" class="active">BMI-Rechner</a></li>
-            <li><a href="daten.html">Daten</a></li>
-            <li><a href="profil.html">Profil</a></li>
-        </ul>
-    </nav>
+<nav>
+    <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="bmirechner.html" class="active">BMI-Rechner</a></li>
+        <li><a href="daten.html">Daten</a></li>
+        <li><a href="profil.html">Profil</a></li>
+    </ul>
+</nav>
 
-    <main>
-        <!-- Login/Logout Button -->
-        <button id="authBtn" type="button">Login</button>
+<main>
+    <button id="authBtn">Login</button>
 
-        <div id="bmiSection">
-            <form id="rechner-form">
-                <input type="number" id="groesse" placeholder="Größe (cm)" required>
-                <input type="number" id="gewicht" placeholder="Gewicht (kg)" required>
-                <input type="number" id="alter" placeholder="Alter" required>
+    <form id="rechner-form">
+        <input type="number" id="groesse" placeholder="Größe (cm)" required>
+        <input type="number" id="gewicht" placeholder="Gewicht (kg)" required>
+        <input type="number" id="alter" placeholder="Alter" required>
 
-                <label>Geschlecht</label>
-                <select id="geschlecht">
-                    <option value="maennlich">Männlich</option>
-                    <option value="weiblich">Weiblich</option>
-                </select>
+        <select id="geschlecht">
+            <option value="maennlich">Männlich</option>
+            <option value="weiblich">Weiblich</option>
+        </select>
 
-                <label>Aktivitätslevel</label>
-                <select id="aktivitaet">
-                    <option value="1.2">Niedrig aktiv</option>
-                    <option value="1.55">Mittel aktiv</option>
-                    <option value="1.75">Sehr aktiv</option>
-                </select>
+        <select id="aktivitaet">
+            <option value="1.2">Niedrig aktiv</option>
+            <option value="1.55">Mittel aktiv</option>
+            <option value="1.75">Sehr aktiv</option>
+        </select>
 
-                <button type="submit">Berechnen</button>
-            </form>
+        <button type="submit">Berechnen</button>
+    </form>
 
-            <div id="ergebnis"></div>
-        </div>
-    </main>
+    <div id="ergebnis"></div>
+</main>
 
-    <footer>
-            <p>© BMI- & Kalorien-Rechner 2026</p>
-            <p>Ein Projekt von: Nour-Eddine Bekkali & Kevin Butgereit</p>
-        </footer>
+<footer>
+    <p>© BMI- & Kalorien-Rechner 2026</p>
+</footer>
 </section>
 
-<!-- Projekt.js & Auth.js -->
 <script src="js/projekt.js"></script>
 <script src="js/auth.js"></script>
 
