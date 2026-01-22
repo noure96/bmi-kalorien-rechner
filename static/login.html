@@ -7,59 +7,47 @@
 
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/footer.css">
-
 </head>
 <body>
 
-    <main>
-        <h2>Login</h2>
+<main>
+    <h2>Login</h2>
 
-        <form id="loginForm">
-            <input type="text" id="username" placeholder="Benutzername" required>
-            <input type="password" id="password" placeholder="Passwort" required>
-            <button type="submit">Einloggen</button>
-            <div id="error"></div>
-        </form>
-    </main>
+    <form id="loginForm">
+        <input type="text" id="username" placeholder="Benutzername" required>
+        <input type="password" id="password" placeholder="Passwort" required>
+        <button type="submit">Einloggen</button>
+        <div id="error"></div>
+    </form>
+</main>
 
-    <script>
-        document.getElementById("loginForm").addEventListener("submit", async e => {
-            e.preventDefault();
+<footer>
+    <p>© BMI- & Kalorien-Rechner 2026</p>
+</footer>
 
-            const res = await fetch("/api/login", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    username: username.value.trim(),
-                    password: password.value
-                })
-            });
+<script>
+document.getElementById("loginForm").addEventListener("submit", async e => {
+    e.preventDefault();
 
-            const data = await res.json();
+    const res = await fetch("/api/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            username: username.value.trim(),
+            password: password.value
+        })
+    });
 
-            if (data.success && data.token) {
-                localStorage.setItem("token", data.token);
-                location.href = "bmirechner.html";
-            } else {
-                document.getElementById("error").textContent =
-                    "Login fehlgeschlagen";
-            }
-        });
-    </script>
-    <script>
-if (sessionStorage.getItem('fromBMI') !== 'true') {
-    // Kein Zugriff: Zurück zur BMI-Seite
-    window.location.href = 'bmirechner.html';
-} else {
-    // Zugriff erlaubt → Sitzung zurücksetzen, damit man Seite nicht neu laden kann
-    sessionStorage.removeItem('fromBMI');
-}
+    const data = await res.json();
+
+    if (data.success && data.token) {
+        localStorage.setItem("token", data.token);
+        location.href = "bmirechner.html";
+    } else {
+        document.getElementById("error").textContent = "Login fehlgeschlagen";
+    }
+});
 </script>
-
-        <footer>
-            <p>© BMI- & Kalorien-Rechner 2026</p>
-            <p>Ein Projekt von: Nour-Eddine Bekkali & Kevin Butgereit</p>
-        </footer>
 
 </body>
 </html>

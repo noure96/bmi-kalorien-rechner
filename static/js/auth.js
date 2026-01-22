@@ -1,46 +1,38 @@
-document.addEventListener('DOMContentLoaded', () => {
-    const authBtn = document.getElementById('authBtn');
+document.addEventListener("DOMContentLoaded", async () => {
+    const token = localStorage.getItem("token");
+    const page = location.pathname.split("/").pop();
 
-    function updateAuthButton() {
-        const token = localStorage.getItem('token');
+    // Login-Seite niemals blockieren
+    if (page === "login.html") return;
 
-        if (token) {
-            authBtn.textContent = 'Logout';
-            authBtn.style.backgroundColor = 'red';
-            authBtn.style.color = 'white';
-
-            authBtn.onclick = async () => {
-                try {
-                    await fetch('/api/logout', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ token })
-                    });
-                } catch {}
-
-                // 🔥 ALLES zurücksetzen
-                localStorage.clear();
-                sessionStorage.clear();
-
-                // Formular & Ergebnis löschen
-                document.getElementById("rechner-form").reset();
-                document.getElementById("ergebnis").innerHTML = "";
-                document.getElementById("ergebnis").style.display = "none";
-
-                // Immer auf Login
-                window.location.href = "../login.html";
-            };
-
-        } else {
-            authBtn.textContent = 'Login';
-            authBtn.style.backgroundColor = '';
-            authBtn.style.color = '';
-
-            authBtn.onclick = () => {
-                window.location.href = '../login.html';
-            };
-        }
+    // Kein Token → IMMER Login
+    if (!token) {
+        location.href = "login.html";
+        return;
     }
 
-    updateAuthButton();
+    // Token beim Server prüfen
+    try {
+        const res = await fetch("/api/checkLogin", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ token })
+        });
+
+        const data = await res.json();
+
+        if (!data.valid) {
+            localStorage.clear();
+            location.href = "login.html";
+            return;
+        }
+
+        // Token erneuern
+        localStorage.setItem("token", data.newToken);
+
+    } catch {
+        // Server nicht erreichbar → sicherheitshalber raus
+        localStorage.clear();
+        location.href = "login.html";
+    }
 });
