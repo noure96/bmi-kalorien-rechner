@@ -161,6 +161,23 @@ function handleGetProfileApi(req, res) {
     });
 }
 
+const username = 'admin'; // Benutzername
+const newPassword = '123456'; // neues Passwort
+const file = './node/users.json';
+
+// Salt & Hash erstellen
+const salt = crypto.randomBytes(16).toString('hex');
+const hash = crypto.pbkdf2Sync(newPassword, salt, 10000, 64, 'sha512').toString('hex');
+
+// JSON laden
+const users = JSON.parse(fs.readFileSync(file, 'utf8'));
+users[username].password = { salt, hash };
+
+// Speichern
+fs.writeFileSync(file, JSON.stringify(users, null, 2));
+console.log(`Passwort für ${username} wurde gesetzt!`);
+
+
 // ===== STATIC FILES =====
 function getContentType(file) {
     const ext = path.extname(file);
