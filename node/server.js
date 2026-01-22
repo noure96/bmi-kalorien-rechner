@@ -171,13 +171,23 @@ function getContentType(file) {
 }
 
 function serveStatic(req, res) {
-    const filePath = req.url === '/' ? path.join(STATIC_DIR, 'index.html') : path.join(STATIC_DIR, req.url);
+    const cleanUrl = req.url.split('?')[0]; // ← DAS FEHLTE
+    const filePath =
+        cleanUrl === '/'
+            ? path.join(STATIC_DIR, 'login.html')
+            : path.join(STATIC_DIR, cleanUrl);
+
     fs.readFile(filePath, (err, data) => {
-        if (err) return sendHtml(res, 404, '<h1>404 - Not Found</h1>');
+        if (err) {
+            console.error("404:", filePath);
+            return sendHtml(res, 404, '<h1>404 - Not Found</h1>');
+        }
+
         res.writeHead(200, { 'Content-Type': getContentType(filePath) });
         res.end(data);
     });
 }
+
 
 // ===== ROUTER =====
 function router(req, res) {
