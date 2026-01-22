@@ -5,14 +5,14 @@ const crypto = require('crypto');
 
 const PORT = 3000;
 const STATIC_DIR = path.join(__dirname, '../static');
-const TOKEN_LIFETIME = 30 * 60 * 1000; // 30 Minuten
+const TOKEN_LIFETIME = 30 * 60 * 1000;
 
 // ===== Helpers =====
 function readRequestBody(req, callback) {
     let body = '';
     req.on('data', chunk => body += chunk);
     req.on('end', () => {
-        try { callback(null, JSON.parse(body)); } 
+        try { callback(null, JSON.parse(body)); }
         catch { callback(true, null); }
     });
 }
@@ -28,12 +28,6 @@ function sendHtml(res, status, html) {
 }
 
 // ===== Security =====
-function hashPassword(password) {
-    const salt = crypto.randomBytes(16).toString('hex');
-    const hash = crypto.pbkdf2Sync(password, salt, 10000, 64, 'sha512').toString('hex');
-    return { salt, hash };
-}
-
 function verifyPassword(password, salt, hash) {
     const check = crypto.pbkdf2Sync(password, salt, 10000, 64, 'sha512').toString('hex');
     return check === hash;
@@ -54,7 +48,7 @@ function saveUsers(users) {
 let activeTokens = {};
 
 function generateToken() {
-    return crypto.randomBytes(32).toString('hex').toUpperCase();
+    return crypto.randomBytes(32).toString('hex');
 }
 
 function storeToken(token, username) {
@@ -62,65 +56,52 @@ function storeToken(token, username) {
 }
 
 function isTokenValid(token) {
-    if (!activeTokens[token]) return false;
-    return (Date.now() - activeTokens[token].createdAt) < TOKEN_LIFETIME;
+    return activeTokens[token] &&
+        Date.now() - activeTokens[token].createdAt < TOKEN_LIFETIME;
 }
 
 function cleanupTokens() {
     const now = Date.now();
-    for (const token in activeTokens) {
-        if ((now - activeTokens[token].createdAt) > TOKEN_LIFETIME) {
-            delete activeTokens[token];
+    for (const t in activeTokens) {
+        if (now - activeTokens[t].createdAt > TOKEN_LIFETIME) {
+            delete activeTokens[t];
         }
     }
 }
 
 // ===== API =====
-
-// LOGIN
 function handleLoginApi(req, res) {
-    if (req.method !== 'POST') return sendJson(res, 405, { success: false });
-
     readRequestBody(req, (err, data) => {
-        if (err || !data.username || !data.password) return sendJson(res, 400, { success: false });
+        if (err) return sendJson(res, 400, { success: false });
 
         const users = loadUsers();
         const user = users[data.username];
         if (!user) return sendJson(res, 401, { success: false });
 
-        if (!verifyPassword(data.password, user.password.salt, user.password.hash)) 
+        if (!verifyPassword(data.password, user.password.salt, user.password.hash))
             return sendJson(res, 401, { success: false });
 
         const token = generateToken();
         storeToken(token, data.username);
-
         sendJson(res, 200, { success: true, token });
     });
 }
 
-// TOKEN CHECK
 function handleCheckLoginApi(req, res) {
-    if (req.method !== 'POST') return sendJson(res, 405, { valid: false });
     readRequestBody(req, (err, data) => {
-        if (err || !data.token) return sendJson(res, 400, { valid: false });
-
         cleanupTokens();
-        if (!isTokenValid(data.token)) {
-            delete activeTokens[data.token];
+        if (!data?.token || !isTokenValid(data.token))
             return sendJson(res, 401, { valid: false });
-        }
 
-        // Erneuern
         const username = activeTokens[data.token].username;
         delete activeTokens[data.token];
         const newToken = generateToken();
         storeToken(newToken, username);
 
-        sendJson(res, 200, { valid: true, newToken, expiresIn: TOKEN_LIFETIME });
+        sendJson(res, 200, { valid: true, newToken });
     });
 }
 
-// LOGOUT
 function handleLogoutApi(req, res) {
     readRequestBody(req, (_, data) => {
         if (data?.token) delete activeTokens[data.token];
@@ -128,85 +109,56 @@ function handleLogoutApi(req, res) {
     });
 }
 
-// PROFILE SAVE
 function handleSaveProfileApi(req, res) {
     readRequestBody(req, (err, data) => {
-        if (err || !data.token || !data.height || !data.weight || !data.age || !data.gender || !data.activity || !data.bmi || !data.calories) return sendJson(res, 400, { success: false });
+        if (err) return sendJson(res, 400, { success: false });
+
         const tokenData = activeTokens[data.token];
         if (!tokenData) return sendJson(res, 401, { success: false });
 
         const users = loadUsers();
-        const user = users[tokenData.username];
-
-        const heightM = data.height / 100;
-        const bmi = (data.weight / (heightM * heightM)).toFixed(2);
-
-        user.profile = { height: data.height, weight: data.weight, age: data.age, gender: data.gender, activity: data.activity, bmi: bmi, calories: data.calories };
+        users[tokenData.username].profile = {
+            height: data.height,
+            weight: data.weight,
+            age: data.age,
+            gender: data.gender,
+            activity: data.activity,
+            bmi: data.bmi,
+            calories: data.calories
+        };
         saveUsers(users);
-
-        sendJson(res, 200, { success: true, bmi });
+        sendJson(res, 200, { success: true });
     });
 }
 
-// PROFILE GET
 function handleGetProfileApi(req, res) {
     readRequestBody(req, (err, data) => {
-        if (err || !data.token) return sendJson(res, 400, { success: false });
         const tokenData = activeTokens[data.token];
         if (!tokenData) return sendJson(res, 401, { success: false });
 
         const users = loadUsers();
-        const profile = users[tokenData.username].profile;
-        sendJson(res, 200, { success: true, profile });
+        sendJson(res, 200, {
+            success: true,
+            profile: users[tokenData.username].profile
+        });
     });
 }
 
-const username = 'admin'; // Benutzername
-const newPassword = '123456'; // neues Passwort
-const file = './node/users.json';
-
-// Salt & Hash erstellen
-const salt = crypto.randomBytes(16).toString('hex');
-const hash = crypto.pbkdf2Sync(newPassword, salt, 10000, 64, 'sha512').toString('hex');
-
-// JSON laden
-const users = JSON.parse(fs.readFileSync(file, 'utf8'));
-users[username].password = { salt, hash };
-
-// Speichern
-fs.writeFileSync(file, JSON.stringify(users, null, 2));
-console.log(`Passwort für ${username} wurde gesetzt!`);
-
-
-// ===== STATIC FILES =====
-function getContentType(file) {
-    const ext = path.extname(file);
-    if (ext === '.html') return 'text/html';
-    if (ext === '.js') return 'text/javascript';
-    if (ext === '.css') return 'text/css';
-    return 'text/plain';
-}
-
+// ===== Static =====
 function serveStatic(req, res) {
-    const cleanUrl = req.url.split('?')[0]; // ← DAS FEHLTE
-    const filePath =
-        cleanUrl === '/'
-            ? path.join(STATIC_DIR, 'login.html')
-            : path.join(STATIC_DIR, cleanUrl);
+    const cleanUrl = req.url.split('?')[0];
+    const filePath = cleanUrl === '/'
+        ? path.join(STATIC_DIR, 'login.html')
+        : path.join(STATIC_DIR, cleanUrl);
 
     fs.readFile(filePath, (err, data) => {
-        if (err) {
-            console.error("404:", filePath);
-            return sendHtml(res, 404, '<h1>404 - Not Found</h1>');
-        }
-
-        res.writeHead(200, { 'Content-Type': getContentType(filePath) });
+        if (err) return sendHtml(res, 404, '404');
+        res.writeHead(200);
         res.end(data);
     });
 }
 
-
-// ===== ROUTER =====
+// ===== Router =====
 function router(req, res) {
     if (req.url === '/api/login') return handleLoginApi(req, res);
     if (req.url === '/api/checkLogin') return handleCheckLoginApi(req, res);
@@ -216,7 +168,7 @@ function router(req, res) {
     serveStatic(req, res);
 }
 
-// ===== SERVER START =====
+// ===== Start =====
 http.createServer(router).listen(PORT, () => {
     console.log(`Server läuft auf http://localhost:${PORT}`);
 });
