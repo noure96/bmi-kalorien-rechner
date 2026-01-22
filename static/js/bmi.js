@@ -1,78 +1,100 @@
-const form = document.getElementById("rechner-form");
-const ergebnisDiv = document.getElementById("ergebnis");
-
-form.addEventListener("submit", async e => {
-    e.preventDefault();
-
-    const groesse = Number(document.getElementById("groesse").value);
-    const gewicht = Number(document.getElementById("gewicht").value);
-    const alter = Number(document.getElementById("alter").value);
-    const geschlecht = document.getElementById("geschlecht").value;
-    const aktivitaet = Number(document.getElementById("aktivitaet").value);
-
-    if(!groesse || !gewicht || !alter) return;
-
-    const bmi = gewicht / ((groesse / 100) ** 2);
-    const grundumsatz = geschlecht === "maennlich"
-        ? 10 * gewicht + 6.25 * groesse - 5 * alter + 5
-        : 10 * gewicht + 6.25 * groesse - 5 * alter - 161;
-
-    const kalorien = Math.round(grundumsatz * aktivitaet);
-
-    ergebnisDiv.style.display = "block";
-    ergebnisDiv.innerHTML = `
-        <p><strong>BMI:</strong> ${bmi.toFixed(1)}</p>
-        <p><strong>Kalorienbedarf:</strong> ${kalorien} kcal</p>
-    `;
-
-    // Speichern im Profil
-    const token = localStorage.getItem("token");
-    if(!token) return;
-
-    await fetch("/api/profile/save", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-            token,
-            height: groesse,
-            weight: gewicht,
-            age: alter,
-            gender: geschlecht,
-            activity: aktivitaet,
-            bmi: bmi.toFixed(1),
-            calories: kalorien
-        })
-    });
-});
-
-// Daten beim Laden wiederherstellen
 document.addEventListener("DOMContentLoaded", async () => {
+    const groesse = document.getElementById("groesse");
+    const gewicht = document.getElementById("gewicht");
+    const alter = document.getElementById("alter");
+    const geschlecht = document.getElementById("geschlecht");
+    const aktivitaet = document.getElementById("aktivitaet");
+    const ergebnisDiv = document.getElementById("ergebnis");
+    const authBtn = document.getElementById("authBtn");
+
     const token = localStorage.getItem("token");
-    if(!token) return;
 
-    const res = await fetch("/api/profile/get", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ token })
-    });
-
-    if(!res.ok) return;
-    const data = await res.json();
-    if(!data.success || !data.profile) return;
-
-    const p = data.profile;
-
-    document.getElementById("groesse").value = p.height || "";
-    document.getElementById("gewicht").value = p.weight || "";
-    document.getElementById("alter").value = p.age || "";
-    document.getElementById("geschlecht").value = p.gender || "maennlich";
-    document.getElementById("aktivitaet").value = p.activity || 1.2;
-
-    if(p.bmi && p.calories){
-        ergebnisDiv.style.display = "block";
-        ergebnisDiv.innerHTML = `
-            <p><strong>BMI:</strong> ${p.bmi}</p>
-            <p><strong>Kalorienbedarf:</strong> ${p.calories} kcal</p>
-        `;
+    if (token) {
+        authBtn.textContent = "Logout";
+        authBtn.style.backgroundColor = "red";
     }
+
+    authBtn.onclick = async () => {
+        if (authBtn.textContent === "Login") return location.href = "login.html";
+
+        await fetch("/api/logout", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ token })
+        });
+
+        localStorage.clear();
+        groesse.value = "";
+        gewicht.value = "";
+        alter.value = "";
+        geschlecht.value = "maennlich";
+        aktivitaet.value = "1.2";
+        ergebnisDiv.style.display = "none";
+
+        location.reload();
+    };
+
+    // Profil laden
+    if (token) {
+        try {
+            const res = await fetch("/api/profile/get", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ token })
+            });
+            const data = await res.json();
+            if (data.success && data.profile) {
+                const p = data.profile;
+                groesse.value = p.height || "";
+                gewicht.value = p.weight || "";
+                alter.value = p.age || "";
+                geschlecht.value = p.gender || "maennlich";
+                aktivitaet.value = p.activity || "1.2";
+
+                if (p.bmi) {
+                    ergebnisDiv.style.display = "block";
+                    ergebnisDiv.innerHTML = `
+                        <p>BMI: ${p.bmi}</p>
+                        <p>Kalorienbedarf: ${p.calories} kcal</p>
+                    `;
+                }
+            }
+        } catch {}
+    }
+
+    // Berechnen
+    document.getElementById("rechner-form").addEventListener("submit", async e => {
+        e.preventDefault();
+        const h = Number(groesse.value);
+        const w = Number(gewicht.value);
+        const a = Number(alter.value);
+        const g = geschlecht.value;
+        const act = Number(aktivitaet.value);
+
+        const bmi = (w / ((h / 100) ** 2)).toFixed(1);
+        const grundumsatz = g === "maennlich"
+            ? 10*w + 6.25*h - 5*a + 5
+            : 10*w + 6.25*h - 5*a - 161;
+        const kcal = Math.round(grundumsatz * act);
+
+        ergebnisDiv.style.display = "block";
+        ergebnisDiv.innerHTML = `<p>BMI: ${bmi}</p><p>Kalorienbedarf: ${kcal} kcal</p>`;
+
+        if (!token) return;
+
+        await fetch("/api/profile/save", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                token,
+                height: h,
+                weight: w,
+                age: a,
+                gender: g,
+                activity: act,
+                bmi,
+                calories: kcal
+            })
+        });
+    });
 });

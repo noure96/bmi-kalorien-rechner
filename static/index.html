@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BMI-Rechner</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BMI-Rechner</title>
 
-    <link rel="stylesheet" href="css/grid.css">
-    <link rel="stylesheet" href="css/menue.css">
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/footer.css">
+<link rel="stylesheet" href="css/grid.css">
+<link rel="stylesheet" href="css/menue.css">
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/footer.css">
 </head>
 <body>
 <section class="wrapper">
@@ -18,7 +18,7 @@
 
     <nav>
         <ul>
-            <li><a href="index.html" class="active">Home</a></li>
+            <li><a href="index.html">Home</a></li>
             <li><a href="bmirechner.html">BMI-Rechner</a></li>
             <li><a href="daten.html">Daten</a></li>
             <li><a href="profil.html">Profil</a></li>
@@ -27,7 +27,7 @@
 
     <main>
         <h2 class="home">Willkommen zurück!</h2>
-        <p class="home">Hallo <span id="usernameDisplay">Platzhalter</span></p>
+        <p class="home">Hallo <span id="username">Platzhalter</span></p>
         <p class="home">Schön, dass du wieder da bist.</p>
     </main>
 
@@ -36,6 +36,24 @@
         <p>Ein Projekt von: Nour-Eddine Bekkali & Kevin Butgereit</p>
     </footer>
 </section>
-<script src="js/auth.js"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", async () => {
+    const token = localStorage.getItem("token");
+    if (!token) return;
+
+    try {
+        const res = await fetch("/api/profile/get", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ token })
+        });
+        const data = await res.json();
+        if (data.success && data.profile) {
+            document.getElementById("username").textContent = data.profile.username || "User";
+        }
+    } catch {}
+});
+</script>
 </body>
 </html>

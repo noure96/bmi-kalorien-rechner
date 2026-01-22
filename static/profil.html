@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Profil</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Profil</title>
 
-    <link rel="stylesheet" href="css/grid.css">
-    <link rel="stylesheet" href="css/menue.css">
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/footer.css">
+<link rel="stylesheet" href="css/grid.css">
+<link rel="stylesheet" href="css/menue.css">
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/footer.css">
 </head>
 <body>
 <section class="wrapper">
@@ -26,8 +26,7 @@
     </nav>
 
     <main>
-        <h2>Gespeicherte Werte</h2>
-        <div id="profil">Lade Profil …</div>
+        <div id="profil"><p>Lade Profil …</p></div>
     </main>
 
     <footer>
@@ -36,12 +35,10 @@
     </footer>
 </section>
 
-<script src="js/auth.js"></script>
 <script>
 document.addEventListener("DOMContentLoaded", async () => {
     const token = localStorage.getItem("token");
     const profil = document.getElementById("profil");
-
     if (!token) {
         profil.innerHTML = "<p>Bitte einloggen, um Profil zu sehen.</p>";
         return;
@@ -53,19 +50,15 @@ document.addEventListener("DOMContentLoaded", async () => {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ token })
         });
-        if(!res.ok) throw new Error();
         const data = await res.json();
-        if(!data.success || !data.profile) {
-            profil.innerHTML = "<p>Kein Profil vorhanden.</p>";
-            return;
+        if (data.success && data.profile) {
+            const p = data.profile;
+            profil.innerHTML = `
+                <p><strong>Größe:</strong> ${p.height} cm</p>
+                <p><strong>Alter:</strong> ${p.age}</p>
+                <p><strong>Geschlecht:</strong> ${p.gender}</p>
+            `;
         }
-
-        const p = data.profile;
-        profil.innerHTML = `
-            <p><strong>BMI:</strong> ${p.bmi || "-"} </p>
-            <p><strong>Kalorienbedarf:</strong> ${p.calories || "-"} kcal</p>
-            <p><strong>Aktivitätslevel:</strong> ${p.activity || "-"}</p>
-        `;
     } catch {
         profil.innerHTML = "<p>Fehler beim Laden des Profils.</p>";
     }

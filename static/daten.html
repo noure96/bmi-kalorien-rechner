@@ -1,19 +1,19 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Daten</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Profil Daten</title>
 
-    <link rel="stylesheet" href="css/grid.css">
-    <link rel="stylesheet" href="css/menue.css">
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/footer.css">
+<link rel="stylesheet" href="css/grid.css">
+<link rel="stylesheet" href="css/menue.css">
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/footer.css">
 </head>
 <body>
 <section class="wrapper">
     <header>
-        <h1>Mein Profil</h1>
+        <h1>Gespeicherte Daten</h1>
     </header>
 
     <nav>
@@ -26,8 +26,7 @@
     </nav>
 
     <main>
-        <h2>Gespeicherte Daten</h2>
-        <div id="datem">Lade Daten …</div>
+        <div id="datem"><p>Lade Daten …</p></div>
     </main>
 
     <footer>
@@ -36,12 +35,10 @@
     </footer>
 </section>
 
-<script src="js/auth.js"></script>
 <script>
 document.addEventListener("DOMContentLoaded", async () => {
     const token = localStorage.getItem("token");
     const datem = document.getElementById("datem");
-
     if (!token) {
         datem.innerHTML = "<p>Bitte einloggen, um Daten zu sehen.</p>";
         return;
@@ -53,21 +50,15 @@ document.addEventListener("DOMContentLoaded", async () => {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ token })
         });
-
-        if(!res.ok) throw new Error();
         const data = await res.json();
-        if(!data.success || !data.profile) {
-            datem.innerHTML = "<p>Kein Profil vorhanden.</p>";
-            return;
+        if (data.success && data.profile) {
+            const p = data.profile;
+            datem.innerHTML = `
+                <p><strong>Aktivität:</strong> ${p.activity}</p>
+                <p><strong>BMI:</strong> ${p.bmi}</p>
+                <p><strong>Kalorienbedarf:</strong> ${p.calories} kcal</p>
+            `;
         }
-
-        const p = data.profile;
-        datem.innerHTML = `
-            <p><strong>Alter:</strong> ${p.age || "-"} Jahre</p
-            <p><strong>Geschlecht:</strong> ${p.gender || "-"}</p>
-            <p><strong>Größe:</strong> ${p.height || "-"} cm</p>
-            <p><strong>Gewicht:</strong> ${p.weight || "-"} kg</p>
-        `;
     } catch {
         datem.innerHTML = "<p>Fehler beim Laden der Daten.</p>";
     }

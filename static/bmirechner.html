@@ -1,29 +1,20 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BMI- & Kalorien-Rechner</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BMI- & Kalorien-Rechner</title>
 
-    <link rel="apple-touch-icon" sizes="180x180" href="favicon/apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="favicon/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="favicon/favicon-16x16.png">
-    <link rel="manifest" href="favicon/site.webmanifest">
+<link rel="stylesheet" href="css/grid.css">
+<link rel="stylesheet" href="css/menue.css">
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/footer.css">
 
-    <link rel="stylesheet" href="css/grid.css">
-    <link rel="stylesheet" href="css/menue.css">
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/footer.css">
-
-    <style>
-        #ergebnis { display: none; margin-top: 10px; }
-        #error { color:red; margin-top:10px; }
-        #bmiSection { display: block; }
-        #authBtn { padding: 8px 15px; cursor: pointer; }
-    </style>
+<style>
+    #ergebnis { display: none; margin-top: 10px; }
+</style>
 </head>
 <body>
-
 <section class="wrapper">
     <header>
         <h1>BMI- & Kalorien-Rechner</h1>
@@ -36,36 +27,29 @@
             <li><a href="daten.html">Daten</a></li>
             <li><a href="profil.html">Profil</a></li>
         </ul>
+        <button id="authBtn" type="button">Login</button>
     </nav>
 
     <main>
-        <!-- Login/Logout Button -->
-        <button id="authBtn" type="button">Login</button>
-
         <div id="bmiSection">
             <form id="rechner-form">
                 <input type="number" id="groesse" placeholder="Größe (cm)" required>
                 <input type="number" id="gewicht" placeholder="Gewicht (kg)" required>
                 <input type="number" id="alter" placeholder="Alter" required>
-
                 <label>Geschlecht</label>
                 <select id="geschlecht">
                     <option value="maennlich">Männlich</option>
                     <option value="weiblich">Weiblich</option>
                 </select>
-
                 <label>Aktivitätslevel</label>
                 <select id="aktivitaet">
                     <option value="1.2">Niedrig aktiv</option>
                     <option value="1.55">Mittel aktiv</option>
                     <option value="1.75">Sehr aktiv</option>
                 </select>
-
                 <button type="submit">Berechnen</button>
             </form>
-
             <div id="ergebnis"></div>
-            <div id="error"></div>
         </div>
     </main>
 
@@ -75,9 +59,6 @@
     </footer>
 </section>
 
-<!-- Skripte -->
-<script src="js/auth.js"></script>
-<script src="js/bmi.js"></script>
-
+<script src="js/bmirechner.js"></script>
 </body>
 </html>

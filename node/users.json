@@ -7,7 +7,11 @@
     "profile": {
       "height": null,
       "weight": null,
-      "bmi": null
+      "age": null,
+      "gender": null,
+      "activity": null,
+      "bmi": null,
+      "calories": null
     }
   }
 }
