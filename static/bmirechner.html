@@ -76,6 +76,24 @@
 <!-- Projekt.js & Auth.js -->
 <script src="js/projekt.js"></script>
 <script src="js/auth.js"></script>
+<script>
+document.getElementById("logoutBtn").onclick = async () => {
+    const token = localStorage.getItem("token");
+
+    try {
+        await fetch("/api/logout", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ token })
+        });
+    } catch {}
+
+    // 🔥 Alles zurücksetzen
+    localStorage.clear();
+
+    location.replace("login.html");
+};
+</script>
 
 </body>
 </html>
