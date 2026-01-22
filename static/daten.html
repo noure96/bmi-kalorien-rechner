@@ -3,12 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BMI-Rechner</title>
-
-    <link rel="apple-touch-icon" sizes="180x180" href="favicon/apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="favicon/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="favicon/favicon-16x16.png">
-    <link rel="manifest" href="favicon/site.webmanifest">
+    <title>Profil</title>
 
     <link rel="stylesheet" href="css/grid.css">
     <link rel="stylesheet" href="css/menue.css">
@@ -18,7 +13,7 @@
 <body>
     <section class="wrapper">
         <header>
-            <h1>BMI- & Kalorien-Rechner</h1>
+            <h1>Mein Profil</h1>
         </header>
 
         <nav>
@@ -26,31 +21,15 @@
                 <li><a href="index.html">Home</a></li>
                 <li><a href="bmirechner.html">BMI-Rechner</a></li>
                 <li><a href="daten.html">Daten</a></li>
-                <li><a href="profil.html">Profil</a></li>
+                <li><a href="profil.html" class="active">Profil</a></li>
             </ul>
         </nav>
 
         <main>
-            <h2>
-                Gespeicherte Daten
-            </h2>
+            <h2>Gespeicherte Daten</h2>
 
-            <div>
-                <article>
-                    Bla
-                </article>
-            </div>
-
-            <div>
-                <article>
-                    Bla
-                </article>
-            </div>
-
-            <div>
-                <article>
-                    Bla
-                </article>
+            <div id="datem">
+                <p>Lade Daten …</p>
             </div>
         </main>
 
@@ -59,5 +38,49 @@
             <p>Ein Projekt von: Nour-Eddine Bekkali & Kevin Butgereit</p>
         </footer>
     </section>
+
+    <!-- Zugriffsschutz -->
+    <script src="js/auth.js"></script>
+
+    <!-- Profil laden -->
+    <script>
+        document.addEventListener("DOMContentLoaded", async () => {
+            const token = localStorage.getItem("token");
+            if (!token) return;
+
+            try {
+                const res = await fetch("/api/profile/get", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ token })
+                });
+
+                if (!res.ok) throw new Error();
+
+                const data = await res.json();
+                if (!data.success || !data.profile) {
+                    document.getElementById("profil").innerHTML =
+                        "<p>Kein Profil vorhanden.</p>";
+                    return;
+                }
+
+                const p = data.profile;
+
+                document.getElementById("profil").innerHTML = `
+                    <p><strong>Größe:</strong> ${p.height} cm</p>
+                    <p><strong>Gewicht:</strong> ${p.weight} kg</p>
+                    <p><strong>Alter:</strong> ${p.age}</p>
+                    <p><strong>Geschlecht:</strong> ${p.gender}</p>
+                    <p><strong>Aktivitätsfaktor:</strong> ${p.activity}</p>
+                    <p><strong>BMI:</strong> ${p.bmi}</p>
+                    <p><strong>Kalorienbedarf:</strong> ${p.calories} kcal / Tag</p>
+                `;
+            } catch {
+                document.getElementById("profil").innerHTML =
+                    "<p>Fehler beim Laden des Profils.</p>";
+            }
+        });
+    </script>
+
 </body>
 </html>
