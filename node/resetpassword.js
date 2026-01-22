@@ -11,7 +11,7 @@ function hashPassword(password) {
 
 const users = JSON.parse(fs.readFileSync(USERS_FILE, 'utf8'));
 
-const newPassword = '123456'; // ← HIER ändern
+const newPassword = '123456'; //  HIER ändern
 users.admin.password = hashPassword(newPassword);
 
 fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2));
