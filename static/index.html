@@ -50,7 +50,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         });
         const data = await res.json();
         if (data.success && data.profile) {
-            document.getElementById("username").textContent = data.profile.username || "User";
+            document.getElementById("username").textContent = localStorage.getItem("username");
         }
     } catch {}
 });

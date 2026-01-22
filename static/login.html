@@ -20,7 +20,7 @@
 
 <script>
 const params = new URLSearchParams(location.search);
-const redirect = params.get("redirect") || "bmirechner.html";
+const redirect = params.get("redirect") || "index.html";
 
 document.getElementById("loginForm").addEventListener("submit", async e => {
     e.preventDefault();
@@ -38,13 +38,14 @@ document.getElementById("loginForm").addEventListener("submit", async e => {
 
     if (data.success && data.token) {
         localStorage.setItem("token", data.token);
+        localStorage.setItem("username", username.value.trim()); // ✅ HIER
         location.replace(redirect);
     } else {
-        document.getElementById("error").textContent =
-            "Login fehlgeschlagen";
+        document.getElementById("error").textContent = "Login fehlgeschlagen";
     }
 });
 </script>
+
 
 </body>
 </html>
