@@ -2,47 +2,36 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BMI- & Kalorien-Rechner</title>
+    <title>BMI Rechner</title>
 
     <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/footer.css">
 </head>
 <body>
 
-<section class="wrapper">
-    <header>
-        <h1>BMI- & Kalorien-Rechner</h1>
-        <button id="logoutBtn">Logout</button>
-    </header>
+<h1>BMI- & Kalorien-Rechner</h1>
 
-    <main>
-        <form id="rechner-form">
-            <input type="number" id="groesse" placeholder="Größe (cm)" required>
-            <input type="number" id="gewicht" placeholder="Gewicht (kg)" required>
-            <input type="number" id="alter" placeholder="Alter" required>
+<button id="logoutBtn">Logout</button>
 
-            <select id="geschlecht">
-                <option value="maennlich">Männlich</option>
-                <option value="weiblich">Weiblich</option>
-            </select>
+<form id="rechner-form">
+    <input type="number" id="groesse" placeholder="Größe (cm)" required>
+    <input type="number" id="gewicht" placeholder="Gewicht (kg)" required>
+    <input type="number" id="alter" placeholder="Alter" required>
 
-            <select id="aktivitaet">
-                <option value="1.2">Niedrig aktiv</option>
-                <option value="1.55">Mittel aktiv</option>
-                <option value="1.75">Sehr aktiv</option>
-            </select>
+    <select id="geschlecht">
+        <option value="maennlich">Männlich</option>
+        <option value="weiblich">Weiblich</option>
+    </select>
 
-            <button type="submit">Berechnen</button>
-        </form>
+    <select id="aktivitaet">
+        <option value="1.2">Wenig aktiv</option>
+        <option value="1.55">Mittel aktiv</option>
+        <option value="1.75">Sehr aktiv</option>
+    </select>
 
-        <div id="ergebnis"></div>
-    </main>
+    <button type="submit">Berechnen</button>
+</form>
 
-    <footer>
-        <p>© BMI- & Kalorien-Rechner 2026</p>
-    </footer>
-</section>
+<div id="ergebnis"></div>
 
 <script src="js/auth.js"></script>
 <script src="js/projekt.js"></script>
@@ -59,9 +48,10 @@ document.getElementById("logoutBtn").onclick = async () => {
         });
     } catch {}
 
-    // 🔥 KOMPLETTER RESET
+    // 🔥 Alles zurücksetzen
     localStorage.clear();
-    location.href = "login.html";
+
+    location.replace("login.html");
 };
 </script>
 

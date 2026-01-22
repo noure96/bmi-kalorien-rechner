@@ -1,38 +1,40 @@
-document.addEventListener("DOMContentLoaded", async () => {
+(function () {
     const token = localStorage.getItem("token");
-    const page = location.pathname.split("/").pop();
+    const currentPage = location.pathname.split("/").pop();
 
-    // Login-Seite niemals blockieren
-    if (page === "login.html") return;
+    // Login-Seite nie blockieren
+    if (currentPage === "login.html") return;
 
-    // Kein Token → IMMER Login
+    // Kein Token → sofort zu Login
     if (!token) {
-        location.href = "login.html";
+        location.replace(
+            `login.html?redirect=${encodeURIComponent(currentPage)}`
+        );
         return;
     }
 
     // Token beim Server prüfen
-    try {
-        const res = await fetch("/api/checkLogin", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ token })
-        });
-
-        const data = await res.json();
-
+    fetch("/api/checkLogin", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ token })
+    })
+    .then(res => res.json())
+    .then(data => {
         if (!data.valid) {
             localStorage.clear();
-            location.href = "login.html";
-            return;
+            location.replace(
+                `login.html?redirect=${encodeURIComponent(currentPage)}`
+            );
+        } else {
+            // erneuerten Token speichern
+            localStorage.setItem("token", data.newToken);
         }
-
-        // Token erneuern
-        localStorage.setItem("token", data.newToken);
-
-    } catch {
-        // Server nicht erreichbar → sicherheitshalber raus
+    })
+    .catch(() => {
         localStorage.clear();
-        location.href = "login.html";
-    }
-});
+        location.replace(
+            `login.html?redirect=${encodeURIComponent(currentPage)}`
+        );
+    });
+})();

@@ -2,11 +2,8 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
-
     <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/footer.css">
 </head>
 <body>
 
@@ -14,18 +11,17 @@
     <h2>Login</h2>
 
     <form id="loginForm">
-        <input type="text" id="username" placeholder="Benutzername" required>
-        <input type="password" id="password" placeholder="Passwort" required>
+        <input id="username" placeholder="Benutzername" required>
+        <input id="password" type="password" placeholder="Passwort" required>
         <button type="submit">Einloggen</button>
         <div id="error"></div>
     </form>
 </main>
 
-<footer>
-    <p>© BMI- & Kalorien-Rechner 2026</p>
-</footer>
-
 <script>
+const params = new URLSearchParams(location.search);
+const redirect = params.get("redirect") || "bmirechner.html";
+
 document.getElementById("loginForm").addEventListener("submit", async e => {
     e.preventDefault();
 
@@ -42,9 +38,10 @@ document.getElementById("loginForm").addEventListener("submit", async e => {
 
     if (data.success && data.token) {
         localStorage.setItem("token", data.token);
-        location.href = "bmirechner.html";
+        location.replace(redirect);
     } else {
-        document.getElementById("error").textContent = "Login fehlgeschlagen";
+        document.getElementById("error").textContent =
+            "Login fehlgeschlagen";
     }
 });
 </script>
