@@ -28,7 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.getElementById("ergebnis").style.display = "none";
 
                 // Immer auf Login
-                window.location.href = "login.html";
+                window.location.href = "../login.html";
             };
 
         } else {
@@ -37,7 +37,7 @@ document.addEventListener('DOMContentLoaded', () => {
             authBtn.style.color = '';
 
             authBtn.onclick = () => {
-                window.location.href = 'login.html';
+                window.location.href = '../login.html';
             };
         }
     }

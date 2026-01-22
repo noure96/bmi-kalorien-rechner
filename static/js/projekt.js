@@ -1,60 +1,78 @@
 const form = document.getElementById("rechner-form");
 const ergebnisDiv = document.getElementById("ergebnis");
 
+// Beim Laden prüfen, ob der Benutzer eingeloggt ist und Profil laden
 document.addEventListener('DOMContentLoaded', () => {
-    if (localStorage.getItem('token')) loadProfile();
+    const token = localStorage.getItem('token');
+    if (token) loadProfile();
 });
 
+// Profil laden
 async function loadProfile() {
     const token = localStorage.getItem('token');
     if (!token) return;
 
-    const res = await fetch('/api/profile/get', {
-        method: 'POST',
-        headers: {'Content-Type':'application/json'},
-        body: JSON.stringify({ token })
-    });
+    try {
+        const res = await fetch('/api/profile/get', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ token })
+        });
 
-    const data = await res.json();
-    if (!data.success) return;
+        if (!res.ok) return;
 
-    const p = data.profile;
+        const data = await res.json();
+        if (!data.success || !data.profile) return;
 
-    groesse.value = p.height;
-    gewicht.value = p.weight;
-    alter.value = p.age;
-    geschlecht.value = p.gender;
-    aktivitaet.value = p.activity;
+        const { height, weight, age, gender, activity, bmi, calories } = data.profile;
 
-    ergebnisDiv.style.display = 'block';
-    ergebnisDiv.innerHTML = `
-        <p>BMI: ${p.bmi}</p>
-        <p>Kalorienbedarf: ${p.calories} kcal / Tag</p>
-    `;
+        // Werte ins Formular eintragen
+        document.getElementById("groesse").value = height;
+        document.getElementById("gewicht").value = weight;
+        document.getElementById("alter").value = age;
+        document.getElementById("geschlecht").value = gender;
+        document.getElementById("aktivitaet").value = activity;
+
+        // Ergebnis anzeigen
+        ergebnisDiv.style.display = 'block';
+        ergebnisDiv.innerHTML = `
+            <p>BMI: ${bmi}</p>
+            <p>Kalorienbedarf: ${calories} kcal / Tag</p>
+        `;
+    } catch (e) {
+        console.error("Profil konnte nicht geladen werden", e);
+    }
 }
 
-form.addEventListener("submit", e => {
-    e.preventDefault();
+// BMI & Kalorien Berechnung + Speichern
+form.addEventListener("submit", function(event) {
+    event.preventDefault();
 
-    const g = +groesse.value;
-    const w = +gewicht.value;
-    const a = +alter.value;
-    const sex = geschlecht.value;
-    const act = +aktivitaet.value;
+    const groesse = Number(document.getElementById("groesse").value);
+    const gewicht = Number(document.getElementById("gewicht").value);
+    const alter = Number(document.getElementById("alter").value);
+    const geschlecht = document.getElementById("geschlecht").value;
+    const aktivitaet = Number(document.getElementById("aktivitaet").value);
 
-    const bmi = w / ((g/100)**2);
-    const grund = sex === "maennlich"
-        ? 10*w + 6.25*g - 5*a + 5
-        : 10*w + 6.25*g - 5*a - 161;
+    const groesseM = groesse / 100;
+    const bmi = gewicht / (groesseM * groesseM);
 
-    const kcal = grund * act;
+    let grundumsatz;
+    if (geschlecht === "maennlich")
+        grundumsatz = 10*gewicht + 6.25*groesse - 5*alter + 5;
+    else
+        grundumsatz = 10*gewicht + 6.25*groesse - 5*alter - 161;
 
+    const kalorien = grundumsatz * aktivitaet;
+
+    // Ergebnis anzeigen
     ergebnisDiv.style.display = 'block';
     ergebnisDiv.innerHTML = `
         <p>BMI: ${bmi.toFixed(1)}</p>
-        <p>Kalorienbedarf: ${Math.round(kcal)} kcal / Tag</p>
+        <p>Kalorienbedarf: ${Math.round(kalorien)} kcal / Tag</p>
     `;
 
+    // Profil speichern, falls eingeloggt
     const token = localStorage.getItem('token');
     if (token) {
         fetch('/api/profile/save', {
@@ -62,13 +80,13 @@ form.addEventListener("submit", e => {
             headers:{'Content-Type':'application/json'},
             body: JSON.stringify({
                 token,
-                height:g,
-                weight:w,
-                age:a,
-                gender:sex,
-                activity:act,
-                bmi:bmi.toFixed(1),
-                calories:Math.round(kcal)
+                height: groesse,
+                weight: gewicht,
+                age: alter,
+                gender: geschlecht,
+                activity: aktivitaet,
+                bmi: bmi.toFixed(1),
+                calories: Math.round(kalorien)
             })
         });
     }
