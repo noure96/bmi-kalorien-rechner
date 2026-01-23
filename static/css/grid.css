@@ -13,9 +13,14 @@ body{
     background-color: bisque;
 }
 
+.bodyLogin{
+    background-color: white;
+}
+
 
 .wrapper{
     position: relative;
+    padding-right: 10px;
     width: 1000px;                              /* Begrenzung */
     background-color: beige;                  /* links */
     margin: 0 auto 0 auto;                      /* und */
@@ -27,9 +32,27 @@ body{
     "kopf kopf kopf"
     "menu main main"
     "foot foot foot";
-    _background: url("../img/back_3.jpg") no-repeat center center;
-    _background-size: cover;
     background: radial-gradient(circle,rgba(77, 112, 240, 1) 0%, rgba(255, 255, 255, 1) 0%, rgba(182, 234, 250, 1) 100%);
+}
+
+.wrapperLogin{
+    position: relative;
+    width: 600px;                              /* Begrenzung */
+    background-color: beige;                  /* links */
+    margin: 0 auto 0 auto;                      /* und */
+    display: grid;                              /* rechts */
+    min-height: 100vh;                          /* 100% der Browserhöhe */
+    grid-template-columns: 200px auto 100px;    /* X Achse Aufteilung - Spalten */
+    grid-template-rows: 100px auto 60px;        /* Y Achse Aufteilung - Zeilen */
+    grid-template-areas: 
+    "kopf kopf kopf"
+    "main main main"
+    "foot foot foot";
+    background: radial-gradient(circle,rgba(77, 112, 240, 1) 0%, rgba(255, 255, 255, 1) 0%, rgba(182, 234, 250, 1) 100%);
+}
+
+.mainLogin{
+    padding: 20px;
 }
 
 header{

@@ -4,19 +4,32 @@
     <meta charset="UTF-8">
     <title>Login</title>
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/grid.css">
+    <link rel="stylesheet" href="css/footer.css">
 </head>
-<body>
 
-<main>
-    <h2>Login</h2>
+<body class="bodyLogin">
+    <section class="wrapperLogin">
+        <header>
+            <h1>BMI- & Kalorien-Rechner</h1>
+        </header>
 
-    <form id="loginForm">
-        <input id="username" placeholder="Benutzername" required>
-        <input id="password" type="password" placeholder="Passwort" required>
-        <button type="submit">Einloggen</button>
-        <div id="error"></div>
-    </form>
-</main>
+        <main class="mainLogin">
+            <h2>Login</h2>
+
+            <form id="loginForm">
+                <input id="username" placeholder="Benutzername" required>
+                <input id="password" type="password" placeholder="Passwort" required>
+                <button type="submit">Einloggen</button>
+                <div id="error"></div>
+            </form>
+        </main>
+
+        <footer>
+            <p>© BMI- & Kalorien-Rechner 2026</p>
+            <p>Ein Projekt von: Nour-Eddine Bekkali & Kevin Butgereit</p>
+        </footer>
+    </section>
 
 <script>
 const params = new URLSearchParams(location.search);
@@ -45,7 +58,6 @@ document.getElementById("loginForm").addEventListener("submit", async e => {
     }
 });
 </script>
-
 
 </body>
 </html>

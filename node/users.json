@@ -13,5 +13,37 @@
       "bmi": null,
       "calories": null
     }
+  },
+
+  "kevin": {
+    "password": {
+      "salt": "eff927543ecb61fe1adb9be279f9332e",
+      "hash": "d55e37e7380603f287d640aa0ffc135cd92716dbbbf3b3f14d735e3ccccb0e259f1cbeaaa435d50f859785ea06d4f56c86a76f61496f384fc2e4b7ffd28a1a8d"
+    },
+    "profile": {
+      "height": null,
+      "weight": null,
+      "age": null,
+      "gender": null,
+      "activity": null,
+      "bmi": null,
+      "calories": null
+    }
+  },
+
+  "nour-eddine": {
+    "password": {
+      "salt": "eff927543ecb61fe1adb9be279f9332e",
+      "hash": "d55e37e7380603f287d640aa0ffc135cd92716dbbbf3b3f14d735e3ccccb0e259f1cbeaaa435d50f859785ea06d4f56c86a76f61496f384fc2e4b7ffd28a1a8d"
+    },
+    "profile": {
+      "height": null,
+      "weight": null,
+      "age": null,
+      "gender": null,
+      "activity": null,
+      "bmi": null,
+      "calories": null
+    }
   }
 }

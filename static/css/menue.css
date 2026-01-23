@@ -30,8 +30,30 @@ nav ul li a{
 }
 
 nav ul li a:hover{
-    background: green;
+    background: black;
     color: rgb(255, 255, 255);
+    width: 190px;
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
+    border-right: 20px solid red;
+    text-align: center;
+}
+
+nav ul li button{
+    text-decoration: none;
+    background-color: red;
+    color: white;
+    display: inline-block;
+    width: 150px;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    padding: 10px 0 10px 20px;
+    font-size: 1.2rem;
+    transition: all 1.5s;
+}
+
+nav ul li button:hover{
+    background: red;
+    color: white;
     width: 190px;
     border-top-right-radius: 10px;
     border-bottom-right-radius: 10px;
