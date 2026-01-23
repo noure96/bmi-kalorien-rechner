@@ -59,7 +59,7 @@
                 } catch {}
                 localStorage.removeItem("token");
                 authBtn.textContent = "Login";
-                authBtn.style.backgroundColor = "";
+                authBtn.style.backgroundColor = "blue";
                 // Rechner reseten, aber Userdaten bleiben
                 const form = document.getElementById("rechner-form");
                 if(form) form.reset();
